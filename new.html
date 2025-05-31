@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Student Payment Tracker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      background: linear-gradient(135deg, #6a5acd, #4169e1);
+    }
+
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 3px 10px rgba(0,0,0,0.2);
+      width: 95%;
+      max-width: 800px;
+      text-align: center;
+    }
+
+    h2 {
+      color: #5a4fb0;
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      text-align: left;
+      font-weight: bold;
+      margin-top: 8px;
+      color: #5a4fb0;
+    }
+
+    input, button {
+      margin: 6px 0;
+      padding: 10px;
+      border-radius: 4px;
+      font-size: 14px;
+      border: 1px solid #ddd;
+      width: calc(100% - 14px);
+      box-sizing: border-box;
+    }
+
+    input {
+      background: #f8f8f8;
+      color: black;
+    }
+
+    button {
+      cursor: pointer;
+      font-weight: bold;
+      border: none;
+    }
+
+    .add-btn {
+      background: #ff5dfd;
+      color: white;
+      width: 100%;
+    }
+
+    .add-btn:hover {
+      background: #ff2be3;
+    }
+
+    .search-bar {
+      margin-top: 10px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 4px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      margin-bottom: 10px;
+      background: #f8f8f8;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      background: white;
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 0px 2px 8px rgba(0,0,0,0.15);
+      font-size: 12px;
+    }
+
+    th {
+      background: #5a4fb0;
+      color: white;
+      padding: 10px;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    td {
+      border-bottom: 1px solid #eee;
+      padding: 8px;
+      text-align: center;
+    }
+
+    tr:nth-child(even) {
+      background: #f9f9f9;
+    }
+
+    tr:hover {
+      background: #f0f0f5;
+    }
+
+    .actions button {
+      padding: 6px 8px;
+      margin: 3px;
+      border-radius: 3px;
+      font-size: 12px;
+    }
+
+    .delete-btn {
+      background: #e74c3c;
+      color: white;
+    }
+
+    .edit-btn {
+      background: #f39c12;
+      color: white;
+    }
+
+    .view-payments-btn {
+      background: #3498db;
+      color: white;
+    }
+
+    .payment-modal {
+      display: none;
+      position: fixed;
+      z-index: 2;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .payment-modal-content {
+      background-color: #fefefe;
+      padding: 25px 40px;
+      border-radius: 8px;
+      max-width: 1000px;
+      width: 95%;
+      margin: 60px auto;
+      position: relative;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      font-size: 14px;
+      text-align: left;
+    }
+
+    .payment-modal-close-button {
+      color: #aaa;
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #monthButtons {
+      margin-top: 15px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .month-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      padding: 8px;
+      height: 60px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: 0.2s;
+      user-select: none;
+    }
+
+    .unpaid {
+      background-color: #ff6961;
+      color: white;
+    }
+
+    .paid {
+      background-color: #77dd77;
+      color: white;
+    }
+
+    .month-icon {
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Student Payment Tracker</h2>
+
+    <label for="firstName">First Name:</label>
+    <input type="text" id="firstName" placeholder="Enter first name" required>
+
+    <label for="lastName">Last Name:</label>
+    <input type="text" id="lastName" placeholder="Enter last name" required>
+
+    <label for="phone1">Phone Number (10 digits):</label>
+    <input type="text" id="phone1" placeholder="Enter phone number" required>
+
+    <label for="phone2">Secondary Phone Number (optional):</label>
+    <input type="text" id="phone2" placeholder="Enter secondary phone number">
+
+    <label for="uniqueCode">Unique Code:</label>
+    <input type="text" id="uniqueCode" placeholder="Enter unique code" required>
+
+    <label for="group">Group:</label>
+    <input type="text" id="group" placeholder="Enter group" required>
+
+    <button class="add-btn" onclick="addStudent()">Add Student</button>
+
+    <div class="search-bar">
+      <input type="text" class="search-input" id="searchInput" placeholder="Search by name, group, or code..." onkeyup="refreshTable()">
+    </div>
+
+    <table id="studentTable">
+      <tr>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Phone</th>
+        <th>Secondary Phone</th>
+        <th>Unique Code</th>
+        <th>Group</th>
+        <th>Actions</th>
+      </tr>
+    </table>
+  </div>
+
+  <div id="paymentModal" class="payment-modal">
+    <div class="payment-modal-content">
+      <span class="payment-modal-close-button">&times;</span>
+      <h3>Payments for <span id="paymentModalStudentName"></span></h3>
+      <div id="monthButtons"></div>
+    </div>
+  </div>
+
+  <script>
+    let students = JSON.parse(localStorage.getItem("students") || "[]");
+    const paymentModal = document.getElementById("paymentModal");
+    const paymentModalCloseButton = document.querySelector(".payment-modal-close-button");
+    const studentTable = document.getElementById("studentTable");
+    const paymentModalStudentNameDisplay = document.getElementById("paymentModalStudentName");
+    const monthButtonsContainer = document.getElementById("monthButtons");
+    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const searchInput = document.getElementById("searchInput");
+
+    let currentStudentIndexForPayment = null;
+
+    function saveToLocalStorage() {
+      localStorage.setItem("students", JSON.stringify(students));
+    }
+
+    function refreshTable() {
+      let table = document.getElementById("studentTable");
+      const header = table.rows[0].outerHTML;
+      table.innerHTML = header;
+      const filter = searchInput.value.toLowerCase();
+
+      students.forEach((student, index) => {
+        const combined = `${student.firstName} ${student.lastName} ${student.group} ${student.uniqueCode}`.toLowerCase();
+        if (combined.includes(filter)) {
+          addStudentRow(table, student, index);
+        }
+      });
+    }
+
+    function addStudent() {
+      const phone1 = document.getElementById("phone1").value.trim();
+      if (!/^\d{10}$/.test(phone1)) {
+        alert("Primary phone number must be exactly 10 digits.");
+        return;
+      }
+
+      const lastName = document.getElementById("lastName").value.trim();
+      if (lastName === "") {
+        alert("Last name is required.");
+        return;
+      }
+
+      const uniqueCode = document.getElementById("uniqueCode").value.trim();
+      if (students.some(student => student.uniqueCode === uniqueCode)) {
+        alert("This unique code already exists.");
+        return;
+      }
+
+      let student = {
+        firstName: document.getElementById("firstName").value.trim(),
+        lastName: lastName,
+        phone1: phone1,
+        phone2: document.getElementById("phone2").value.trim() || "N/A",
+        uniqueCode: uniqueCode,
+        group: document.getElementById("group").value.trim(),
+        payments: {}
+      };
+
+      students.push(student);
+      saveToLocalStorage();
+      refreshTable();
+      clearInputFields();
+    }
+
+    function clearInputFields() {
+      document.getElementById("firstName").value = "";
+      document.getElementById("lastName").value = "";
+      document.getElementById("phone1").value = "";
+      document.getElementById("phone2").value = "";
+      document.getElementById("uniqueCode").value = "";
+      document.getElementById("group").value = "";
+    }
+
+    function addStudentRow(table, student, index) {
+      let row = table.insertRow(-1);
+      Object.values(student).slice(0, 6).forEach(value => {
+        let cell = row.insertCell();
+        cell.innerText = value;
+      });
+      let actionCell = row.insertCell();
+      actionCell.innerHTML = `
+        <button class="delete-btn" onclick="deleteStudent(${index})">Delete</button>
+        <button class="edit-btn" onclick="editStudent(${index})">Edit</button>
+        <button class="view-payments-btn" onclick="openPaymentModal(${index})">View Payments</button>
+      `;
+    }
+
+    function deleteStudent(index) {
+      students.splice(index, 1);
+      saveToLocalStorage();
+      refreshTable();
+    }
+
+    function editStudent(index) {
+      let student = students[index];
+      document.getElementById("firstName").value = student.firstName;
+      document.getElementById("lastName").value = student.lastName;
+      document.getElementById("phone1").value = student.phone1;
+      document.getElementById("phone2").value = student.phone2 === "N/A" ? "" : student.phone2;
+      document.getElementById("uniqueCode").value = student.uniqueCode;
+      document.getElementById("group").value = student.group;
+      deleteStudent(index);
+    }
+
+    function openPaymentModal(studentIndex) {
+      const student = students[studentIndex];
+      paymentModalStudentNameDisplay.innerText = `${student.firstName} ${student.lastName}`;
+      monthButtonsContainer.innerHTML = '';
+
+      months.forEach(month => {
+        const div = document.createElement('div');
+        div.classList.add('month-box');
+        const isPaid = student.payments && student.payments[month];
+        div.classList.add(isPaid ? 'paid' : 'unpaid');
+        div.innerHTML = `${month}<div class="month-icon">${isPaid ? '✅' : '❌'}</div>`;
+        div.onclick = () => togglePaymentStatus(studentIndex, month, div);
+        monthButtonsContainer.appendChild(div);
+      });
+
+      paymentModal.style.display = "block";
+      currentStudentIndexForPayment = studentIndex;
+    }
+
+    function togglePaymentStatus(studentIndex, month, element) {
+      const student = students[studentIndex];
+      if (!student.payments) {
+        student.payments = {};
+      }
+      student.payments[month] = !student.payments[month];
+      const isPaid = student.payments[month];
+      element.classList.remove(isPaid ? 'unpaid' : 'paid');
+      element.classList.add(isPaid ? 'paid' : 'unpaid');
+      element.innerHTML = `${month}<div class="month-icon">${isPaid ? '✅' : '❌'}</div>`;
+      saveToLocalStorage();
+    }
+
+    paymentModalCloseButton.onclick = function () {
+      paymentModal.style.display = "none";
+      currentStudentIndexForPayment = null;
+    };
+
+    window.onclick = function (event) {
+      if (event.target === paymentModal) {
+        paymentModal.style.display = "none";
+        currentStudentIndexForPayment = null;
+      }
+    };
+
+    window.onload = refreshTable;
+  </script>
+</body>
+</html>
